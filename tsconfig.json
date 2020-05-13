@@ -1,0 +1,25 @@
+{
+   "extends": "@chatie/tsconfig",
+   "compilerOptions": {
+      "target": "es2019",
+      "sourceMap": true,
+      "outDir": "dist",
+      "baseUrl": ".",
+      "typeRoots": [
+         "./types",
+         "./node_modules/@types"
+      ],
+      // "types":["merge-images"]
+   },
+   "include": [
+      "src"
+   ],
+   "noImplicitAny": false,
+   "experimentalDecorators": true,
+   "emitDecoratorMetadata": true,
+   "esModuleInterop": true,
+   "exclude": [
+      "node_modules",
+      "**/node_modules/*",
+   ]
+}
