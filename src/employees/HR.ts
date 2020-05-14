@@ -26,30 +26,3 @@ export async function autoKick(message: Message, roomsConfig: I_Room[]) {
       }
    })
 }
-
-export async function autoWarn(message: Message, roomsConfig: I_Room[]) {
-   let text = message.text()
-   let room = message.room()
-   let contact = message.from()
-   if (!room) return
-   let roomConfig = matchManageRoom(room, roomsConfig)
-   if (!roomConfig) return
-   let autoWarn = roomConfig.autoWarn
-   let flag = false
-   if (!autoWarn) return
-   if (autoWarn.keyword instanceof RegExp) {
-      flag = autoWarn.keyword.test(text)
-   } else if (typeof autoWarn.keyword === "string") {
-      flag = text.includes(autoWarn.keyword)
-   }
-   await delayQueue(async () => {
-      if (room && flag && roomConfig?.autoWarn?.message && contact) {
-         let instance = await VoteManager.instance()
-         await instance.voteUp(message.id, room.id)
-         let vote = instance.getVote(contact, room)
-         let isVoteMax =  instance.isVoteMax(contact, room, roomConfig)
-         if (!isVoteMax) await instance.sayWarn(room, contact, roomConfig, vote)
-         else await instance.sayBye2WarnOut(room, contact, roomConfig, vote)
-      }
-   })
-}

@@ -17,7 +17,7 @@ export interface I_Room {
     */
    whiteList?: string[]
    autoKick?:I_AutoKick,
-   autoWarn?:I_AutoWarn
+   // autoWarn?:I_AutoWarn
 }
 export interface I_AutoKick{
    keyword:RegExp|string
