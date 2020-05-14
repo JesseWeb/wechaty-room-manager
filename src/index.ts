@@ -1,9 +1,10 @@
-import { log, WechatyPlugin, Wechaty } from "wechaty"
+import { log, WechatyPlugin, Wechaty, Friendship } from "wechaty"
 import { VoteManager } from "./employees/voteManager"
 import { matchManageRoom } from "./pure-functions/matchManageRoom"
 import { I_RoomManager, I_Room } from "./typings"
 import { sayHi, checkKnockKnockRoom } from "./employees/doorman"
-export function manager(options?: I_RoomManager): WechatyPlugin {
+import { delayQueue } from "./pure-functions/rx-queue"
+export function manager(options: I_RoomManager): WechatyPlugin {
    let defaultRoomObj: I_Room = {
       id: "23414576835@chatroom",
       topic: "机器人测试群",//either id or topic , using "===" to compare
@@ -44,7 +45,22 @@ export function manager(options?: I_RoomManager): WechatyPlugin {
             }
             await sayHi(invite, manageRoom, room)
          });
+      })
+      bot.on('friendship', async function (this, friendship) {
+         let type = friendship.type()
+         if (type == Friendship.Type.Receive) {
+            if (options.friendshipAcceped)
+               await friendship.accept()
+         }
+         if (type === Friendship.Type.Confirm) {
+            let contact = friendship.contact()
+            await delayQueue(async () => {
+               if (options.hiTemp) {
+                  await contact.say(options.hiTemp)
+               }
+            })
 
+         }
       })
    }
 }

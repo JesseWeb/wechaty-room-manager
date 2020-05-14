@@ -20,22 +20,22 @@ export async function checkKnockKnockRoom(wechaty: Wechaty, message: Message, ro
             let _room = wechaty.Room.load(config.id)
             if (_room) {
                _room.add(contact)
-               if (config.hiTemp)
-                  sayHi(contact, config, _room)
             }
          } else if (config.topic) {
             let _room = await wechaty.Room.find({ topic: config.topic })
             if (_room) {
                _room.add(contact)
-               if (config.hiTemp)
-                  await sayHi(contact, config, _room)
             }
          }
       }
    })
 }
 export async function sayHi(invite: Contact, roomConfig: I_Room, room: Room) {
-   await delayQueue(async () => {
-      await room.say`${invite} ${roomConfig?.hiTemp}`
-   }, `roomJoin say ${invite} ${roomConfig?.hiTemp}`)
+   if (roomConfig.roomHiTemp) {
+      await delayQueue(async () => {
+         await room.say`${invite} ${roomConfig?.roomHiTemp}`
+      }, `roomJoin say ${invite} ${roomConfig?.roomHiTemp}`)
+   }
+
+
 }

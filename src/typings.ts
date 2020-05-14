@@ -3,7 +3,7 @@ import { Contact } from "wechaty";
 export interface I_Room {
    id?: string,
    topic?: string,
-   hiTemp?: string,
+   roomHiTemp?:string,
    warnTemp?(count: number, voteCount: number | undefined, contact: Contact): string,
    kickoutTemp?(contact: Contact): string,
    // enableVote?: boolean,
@@ -24,7 +24,8 @@ export interface I_RoomManager {
     * it has to be wechat id(wechat account)--based on Contact.load()
     *  */
    admins: string[],
-   friendshipAcceped?: boolean
+   friendshipAcceped?: boolean,
+   hiTemp?: string,
 }
 
 export interface I_Vote {

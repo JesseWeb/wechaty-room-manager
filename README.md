@@ -28,10 +28,14 @@ bot.use(manager({
 
       knockKnock:"我要进群",  //机器人拉用户进入该群的口令
 
-      //拉新人入群的欢迎消息
-      hiTemp:"欢迎入群，请遵守群规", //@someone 欢迎入群，请遵守群规
 
+      //接受好友邀请的
+      
 
+      //新人入群的欢迎消息
+      roomHiTemp:"欢迎入群，请遵守群规", //@someone 欢迎入群，请遵守群规
+
+      
       // 为什么使用array？
       // 因为laptop与手机端表情字符存在不一致的情况。且可支持多指令。
       voteSymbol: ['[弱]', '/:MMWeak'], 
@@ -65,7 +69,12 @@ bot.use(manager({
    //全局管理员、拥有高级能力例如直接踢人
    admins: [
       "xyzcain"
-   ]
+   ],
+   //是否自动接受好友请求
+   friendshipAcceped: true, 
+
+   //接受好友请求发送的内容
+   hiTemp:`你好，我是机器人。加群请发送"我要进群"`, 
 }))
 
 bot.start()
