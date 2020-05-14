@@ -1,8 +1,7 @@
 import { Message } from "wechaty";
-import { I_Room } from "src/typings";
-import { delayQueue } from "src/pure-functions/rx-queue";
-import { matchManageRoom } from "src/pure-functions/matchManageRoom";
-import { VoteManager } from "./VoteManager";
+import { I_Room } from "../typings";
+import { delayQueue } from "../pure-functions/rx-queue";
+import { matchManageRoom } from "../pure-functions/matchManageRoom";
 
 export async function autoKick(message: Message, roomsConfig: I_Room[]) {
    let text = message.text()
