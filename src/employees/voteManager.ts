@@ -1,16 +1,16 @@
 import Lowdb from "lowdb";
-import { I_Database, I_Room, I_Volt } from "../typings";
+import { I_Database, I_Room, I_Vote } from "../typings";
 import FileAsync from "lowdb/adapters/FileAsync";
 import { Contact, Room, Message, log } from "wechaty";
 import { delayQueue } from "../pure-functions/rx-queue";
 let root = process.cwd()
-export class VoltManager {
+export class VoteManager {
    public lowdb: Lowdb.LowdbAsync<I_Database>
-   public static manager: VoltManager
+   public static manager: VoteManager
    constructor(lowdb: Lowdb.LowdbAsync<I_Database>) {
       this.lowdb = lowdb
       this.lowdb.defaults({
-         volts: []
+         votes: []
       } as I_Database)
          .write()
    }
@@ -18,31 +18,31 @@ export class VoltManager {
       if (!this.manager) {
          let adapter = new FileAsync<I_Database>(`${root}/db.json`)
          let lowdb = await Lowdb(adapter)
-         this.manager = new VoltManager(lowdb)
+         this.manager = new VoteManager(lowdb)
       }
       return this.manager
    }
-   getVoltFromDb(query: any) {
-      return this.lowdb.get('volts').find(query).value()
+   getVoteFromDb(query: any) {
+      return this.lowdb.get('votes').find(query).value()
    }
-   setVolt2Db(mentionId: string, roomId: string) {
-      return this.lowdb.get('volts').find({ mentionId, roomId }).update('count', n => n + 1).write()
+   setVote2Db(mentionId: string, roomId: string) {
+      return this.lowdb.get('votes').find({ mentionId, roomId }).update('count', n => n + 1).write()
    }
-   async createVolt2Db(mentionId: string, roomId: string, volterId: string | undefined) {
-      return await this.lowdb.get('volts').push({
-         mentionId, roomId, count: 1, volterId: volterId
+   async createVote2Db(mentionId: string, roomId: string, voteerId: string | undefined) {
+      return await this.lowdb.get('votes').push({
+         mentionId, roomId, count: 1, voteerId: voteerId
       }).write()
    }
-   getVolt(contact: Contact, room: Room) {
-      return this.getVoltFromDb({
+   getVote(contact: Contact, room: Room) {
+      return this.getVoteFromDb({
          mentionId: contact.id,
          roomId: room.id,
       })
    }
-   checkVoltSymbol(message: Message, rule: I_Room | undefined) {
-      if (rule?.voltSymbol) {
-         for (let index = 0; index < rule?.voltSymbol.length; index++) {
-            const symbol = rule?.voltSymbol[index];
+   checkVoteSymbol(message: Message, rule: I_Room | undefined) {
+      if (rule?.voteSymbol) {
+         for (let index = 0; index < rule?.voteSymbol.length; index++) {
+            const symbol = rule?.voteSymbol[index];
             if (message.text().includes(symbol)) {
                return true
             }
@@ -64,12 +64,12 @@ export class VoltManager {
    async kickout(room: Room, contact: Contact) {
       await room.del(contact)
    }
-   async delVolt(contactId: string, roomId: string, volter: Contact) {
-      this.lowdb.get('volts').remove({ mentionId: contactId, roomId, volterId: volter.id })
+   async delVote(contactId: string, roomId: string, voteer: Contact) {
+      this.lowdb.get('votes').remove({ mentionId: contactId, roomId, voteerId: voteer.id })
    }
-   async sayBye2WarnOut(room: Room, contact: Contact, rule: I_Room, volt: I_Volt) {
-      if (rule.voltOutTemp)
-         room.say`${contact} ${rule.voltOutTemp(volt.count, rule.voltCount, contact)}`
+   async sayBye2WarnOut(room: Room, contact: Contact, rule: I_Room, vote: I_Vote) {
+      if (rule.voteOutTemp)
+         room.say`${contact} ${rule.voteOutTemp(vote.count, rule.voteCount, contact)}`
    }
    async sayBye2KickOut(room: Room | null, contact: Contact | null, roomConfig: I_Room | null | undefined) {
       if (!room) {
@@ -87,75 +87,75 @@ export class VoltManager {
       if (roomConfig.kickoutTemp)
          room.say`${contact} ${roomConfig.kickoutTemp(contact)}`
    }
-   async sayWarn(room: Room, contact: Contact, rule: I_Room, volt: I_Volt) {
+   async sayWarn(room: Room, contact: Contact, rule: I_Room, vote: I_Vote) {
       await delayQueue(async () => {
          if (rule.warnTemp) {
-            await room.say`${contact} ${rule.warnTemp(volt.count, rule.voltCount, contact)}`
+            await room.say`${contact} ${rule.warnTemp(vote.count, rule.voteCount, contact)}`
          }
       }, `sayWarn() ${contact}`)
    }
-   async sayDuplicate(room: Room, volter: Contact, mention: Contact) {
+   async sayDuplicate(room: Room, voteer: Contact, mention: Contact) {
       await delayQueue(async () => {
-         room.say`${volter} 你已经警告过 ${mention.name()}, 请不要连续警告.`
-      }, `sayDuplicate() room:${room},volter:${volter}`)
+         room.say`${voteer} 你已经警告过 ${mention.name()}, 请不要连续警告.`
+      }, `sayDuplicate() room:${room},voteer:${voteer}`)
    }
-   async sayVoltAdmins(room: Room, volter: Contact) {
-      room.say`${volter} 请勿警告管理员!`
+   async sayVoteAdmins(room: Room, voteer: Contact) {
+      room.say`${voteer} 请勿警告管理员!`
    }
-   async checkVolt(message: Message, roomsConfig: I_Room[], admins: string[]) {
+   async checkVote(message: Message, roomsConfig: I_Room[], admins: string[]) {
       let mentionList = await message.mentionList()
       let room = message.room()
       if (!room) return
       let roomid = room.id
       let topic = await room?.topic()
-      let volter = message.from()
-      let volterId = volter?.id
+      let voteer = message.from()
+      let voteerId = voteer?.id
       let roomConfig = roomsConfig.find((room) => {
          return (room.topic === topic) || (room.id === roomid)
       })
       if (!roomConfig) return
-      // check voltSymbol match
-      if (!this.checkVoltSymbol(message, roomConfig)) return
+      // check voteSymbol match
+      if (!this.checkVoteSymbol(message, roomConfig)) return
       // check message from room
       for (const mention of mentionList) {
-         if (!volter) continue
+         if (!voteer) continue
          if (mention.self()) {
-            this.sayVoltAdmins(room, volter)
+            this.sayVoteAdmins(room, voteer)
             continue
          }
          let mentionId = mention.id
          //check if whiteList
          if (roomConfig.whiteList?.includes(mentionId)) {
-            this.sayVoltAdmins(room, volter)
+            this.sayVoteAdmins(room, voteer)
             continue
          }
          if (admins.includes(mentionId)) {
-            this.sayVoltAdmins(room, volter)
+            this.sayVoteAdmins(room, voteer)
             continue
          }
 
-         if (!this.checkVoltSymbol(message, roomConfig)) continue
-         let volt = this.getVolt(mention, room)
+         if (!this.checkVoteSymbol(message, roomConfig)) continue
+         let vote = this.getVote(mention, room)
 
          // let's set this guy in warned list 🤪
-         if (!volt) {
-            await this.createVolt2Db(mentionId, room.id, volterId)
-            let _volt = this.getVolt(mention, room)
-            this.sayWarn(room, mention, roomConfig, _volt)
+         if (!vote) {
+            await this.createVote2Db(mentionId, room.id, voteerId)
+            let _vote = this.getVote(mention, room)
+            this.sayWarn(room, mention, roomConfig, _vote)
             continue
          } else {
-            // check volt duplicate by someone  
-            if (volt.mentionId == mentionId && volt.volterId == volter.id) {
-               await this.sayDuplicate(room, volter, mention)
+            // check vote duplicate by someone  
+            if (vote.mentionId == mentionId && vote.voteerId == voteer.id) {
+               await this.sayDuplicate(room, voteer, mention)
                continue
             }
-            let _volt = await this.setVolt2Db(mentionId, room.id)
-            if (volt && volt.count + 1 >= (roomConfig.voltCount || 3)) {
+            let _vote = await this.setVote2Db(mentionId, room.id)
+            if (vote && vote.count + 1 >= (roomConfig.voteCount || 3)) {
                // let's let's kick this guy out 😈
-               this.sayBye2WarnOut(room, mention, roomConfig, volt)
+               this.sayBye2WarnOut(room, mention, roomConfig, vote)
                continue
             }
-            this.sayWarn(room, mention, roomConfig, _volt)
+            this.sayWarn(room, mention, roomConfig, _vote)
             continue
          }
 

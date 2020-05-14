@@ -4,14 +4,14 @@ export interface I_Room {
    id?: string,
    topic?: string,
    hiTemp?: string,
-   warnTemp?(count: number, voltCount: number | undefined, contact: Contact): string,
+   warnTemp?(count: number, voteCount: number | undefined, contact: Contact): string,
    kickoutTemp?(contact: Contact): string,
-   // enableVolt?: boolean,
+   // enableVote?: boolean,
    knockKnock?:string,
-   voltSymbol?: string[],
+   voteSymbol?: string[],
    kickoutSymbol?: string[],
-   voltCount?: number
-   voltOutTemp?(count: number, voltCount: number | undefined, contact: Contact): string
+   voteCount?: number
+   voteOutTemp?(count: number, voteCount: number | undefined, contact: Contact): string
    /**
     * only supported wechaty id(account)
     */
@@ -27,12 +27,12 @@ export interface I_RoomManager {
    friendshipAcceped?: boolean
 }
 
-export interface I_Volt {
+export interface I_Vote {
    mentionId: string,
    roomId: string,
    count: number,
-   volterId: string | undefined | null
+   voteerId: string | undefined | null
 }
 export interface I_Database {
-   volts: I_Volt[]
+   votes: I_Vote[]
 }

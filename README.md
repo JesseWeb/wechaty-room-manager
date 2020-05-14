@@ -34,7 +34,7 @@ bot.use(manager({
 
       // 为什么使用array？
       // 因为laptop与手机端表情字符存在不一致的情况。且可支持多指令。
-      voltSymbol: ['[弱]', '/:MMWeak'], 
+      voteSymbol: ['[弱]', '/:MMWeak'], 
 
       // 该房间的白名单、无法被投票。必须为id，防止修改成同样的alias伪装管理员
       // 注：此whiteList对kickout无效
@@ -49,17 +49,17 @@ bot.use(manager({
       kickoutSymbol: ["[炸弹]", "/:bome"],
 
       // 被投票次数、超出即自动踢出
-      voltCount: 3,
+      voteCount: 3,
       // 踢出模版 
       // 会在开头自动@被踢出人
       kickoutTemp() {
          return "您已被踢出"   //@someone 您已被踢出
       },
-      voltOutTemp(count) {
+      voteOutTemp(count) {
          return `您已被警告${count}次，您已被踢出群聊`  //@someone 您已被警告${count}次，您已被踢出群聊
       },
-      warnTemp(count, voltCount) {
-         return `您已被其他人警告次数达到${count}次，请谨慎发言。警告次数达到${voltCount}将被踢出`
+      warnTemp(count, voteCount) {
+         return `您已被其他人警告次数达到${count}次，请谨慎发言。警告次数达到${voteCount}将被踢出`
       }
    }],
    //全局管理员、拥有高级能力例如直接踢人
