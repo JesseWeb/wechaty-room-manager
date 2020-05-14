@@ -1,6 +1,6 @@
 {
   "name": "wechaty-room-manager",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "a room manager that can manage room.",
   "main": "dist/index.js",
   "scripts": {

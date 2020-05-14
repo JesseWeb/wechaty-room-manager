@@ -1,4 +1,4 @@
-# Wechaty-Room-Manager [![Npm Version](https://img.shields.io/npm/v/wechaty-room-manager.svg?sanitize=true)](https://travis-ci.org/JesseWeb/wechaty-room-manager)
+# Wechaty-Room-Manager [![Npm Version](https://img.shields.io/npm/v/wechaty-room-manager.svg?sanitize=true)](https://www.npmjs.com/package/wechaty-room-manager)
 
 ## What is this?
 
