@@ -64,6 +64,13 @@ bot.use(manager({
       },
       warnTemp(count, voteCount) {
          return `您已被其他人警告次数达到${count}次，请谨慎发言。警告次数达到${voteCount}将被踢出`
+      },
+      autoKick:{
+         keyword: new RegExp("砍我一下") || "帮我助力"  //正则使用test() 。字符串使用includes()
+         message:
+      },
+      autoWarn:{
+
       }
    }],
    //全局管理员、拥有高级能力例如直接踢人

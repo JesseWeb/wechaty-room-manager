@@ -25,12 +25,12 @@ export class VoteManager {
    getVoteFromDb(query: any) {
       return this.lowdb.get('votes').find(query).value()
    }
-   setVote2Db(mentionId: string, roomId: string) {
+   voteUp(mentionId: string, roomId: string) {
       return this.lowdb.get('votes').find({ mentionId, roomId }).update('count', n => n + 1).write()
    }
-   async createVote2Db(mentionId: string, roomId: string, voteerId: string | undefined) {
+   async createVote2Db(mentionId: string, roomId: string, voterId: string | undefined) {
       return await this.lowdb.get('votes').push({
-         mentionId, roomId, count: 1, voteerId: voteerId
+         mentionId, roomId, count: 1, voterId: voterId
       }).write()
    }
    getVote(contact: Contact, room: Room) {
@@ -64,8 +64,8 @@ export class VoteManager {
    async kickout(room: Room, contact: Contact) {
       await room.del(contact)
    }
-   async delVote(contactId: string, roomId: string, voteer: Contact) {
-      this.lowdb.get('votes').remove({ mentionId: contactId, roomId, voteerId: voteer.id })
+   async delVote(contactId: string, roomId: string, voter: Contact) {
+      this.lowdb.get('votes').remove({ mentionId: contactId, roomId, voterId: voter.id })
    }
    async sayBye2WarnOut(room: Room, contact: Contact, rule: I_Room, vote: I_Vote) {
       if (rule.voteOutTemp)
@@ -94,13 +94,13 @@ export class VoteManager {
          }
       }, `sayWarn() ${contact}`)
    }
-   async sayDuplicate(room: Room, voteer: Contact, mention: Contact) {
+   async sayDuplicate(room: Room, voter: Contact, mention: Contact) {
       await delayQueue(async () => {
-         room.say`${voteer} 你已经警告过 ${mention.name()}, 请不要连续警告.`
-      }, `sayDuplicate() room:${room},voteer:${voteer}`)
+         room.say`${voter} 你已经警告过 ${mention.name()}, 请不要连续警告.`
+      }, `sayDuplicate() room:${room},voter:${voter}`)
    }
-   async sayVoteAdmins(room: Room, voteer: Contact) {
-      room.say`${voteer} 请勿警告管理员!`
+   async sayVoteAdmins(room: Room, voter: Contact) {
+      room.say`${voter} 请勿警告管理员!`
    }
    async checkVote(message: Message, roomsConfig: I_Room[], admins: string[]) {
       let mentionList = await message.mentionList()
@@ -108,8 +108,8 @@ export class VoteManager {
       if (!room) return
       let roomid = room.id
       let topic = await room?.topic()
-      let voteer = message.from()
-      let voteerId = voteer?.id
+      let voter = message.from()
+      let voterId = voter?.id
       let roomConfig = roomsConfig.find((room) => {
          return (room.topic === topic) || (room.id === roomid)
       })
@@ -118,19 +118,19 @@ export class VoteManager {
       if (!this.checkVoteSymbol(message, roomConfig)) return
       // check message from room
       for (const mention of mentionList) {
-         if (!voteer) continue
+         if (!voter) continue
          if (mention.self()) {
-            this.sayVoteAdmins(room, voteer)
+            this.sayVoteAdmins(room, voter)
             continue
          }
          let mentionId = mention.id
          //check if whiteList
          if (roomConfig.whiteList?.includes(mentionId)) {
-            this.sayVoteAdmins(room, voteer)
+            this.sayVoteAdmins(room, voter)
             continue
          }
          if (admins.includes(mentionId)) {
-            this.sayVoteAdmins(room, voteer)
+            this.sayVoteAdmins(room, voter)
             continue
          }
 
@@ -139,17 +139,17 @@ export class VoteManager {
 
          // let's set this guy in warned list 🤪
          if (!vote) {
-            await this.createVote2Db(mentionId, room.id, voteerId)
+            await this.createVote2Db(mentionId, room.id, voterId)
             let _vote = this.getVote(mention, room)
             this.sayWarn(room, mention, roomConfig, _vote)
             continue
          } else {
             // check vote duplicate by someone  
-            if (vote.mentionId == mentionId && vote.voteerId == voteer.id) {
-               await this.sayDuplicate(room, voteer, mention)
+            if (vote.mentionId == mentionId && vote.voterId == voter.id) {
+               await this.sayDuplicate(room, voter, mention)
                continue
             }
-            let _vote = await this.setVote2Db(mentionId, room.id)
+            let _vote = await this.voteUp(mentionId, room.id)
             if (vote && vote.count + 1 >= (roomConfig.voteCount || 3)) {
                // let's let's kick this guy out 😈
                this.sayBye2WarnOut(room, mention, roomConfig, vote)
@@ -198,4 +198,15 @@ export class VoteManager {
          })
       }
    }
+   isVoteMax(contact: Contact, room: Room, roomConfig: I_Room) {
+      let vote = this.getVote(contact, room)
+      if (roomConfig.voteCount) {
+         if (vote.count >= roomConfig.voteCount) {
+            return true
+         }
+         return false
+      }
+      return false
+   }
+
 }

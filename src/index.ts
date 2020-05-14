@@ -1,9 +1,10 @@
 import { log, WechatyPlugin, Wechaty, Friendship } from "wechaty"
-import { VoteManager } from "./employees/voteManager"
+import { VoteManager } from "./employees/VoteManager"
 import { matchManageRoom } from "./pure-functions/matchManageRoom"
 import { I_RoomManager, I_Room } from "./typings"
 import { sayHi, checkKnockKnockRoom } from "./employees/doorman"
 import { delayQueue } from "./pure-functions/rx-queue"
+import { autoKick, autoWarn } from "./employees/HR"
 export function manager(options: I_RoomManager): WechatyPlugin {
    let defaultRoomObj: I_Room = {
       id: "23414576835@chatroom",
@@ -35,6 +36,8 @@ export function manager(options: I_RoomManager): WechatyPlugin {
          (await VoteManager.instance()).checkVote(message, options.rooms, options.admins);
          (await VoteManager.instance()).checkKick(message, options.rooms, options.admins);
          await checkKnockKnockRoom(this, message, options.rooms)
+         await autoKick(message, options.rooms)
+         await autoWarn(message, options.rooms)
       })
 
       bot.on('room-join', async function (this, room, inviteList) {

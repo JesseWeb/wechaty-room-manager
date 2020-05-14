@@ -16,6 +16,16 @@ export interface I_Room {
     * only supported wechaty id(account)
     */
    whiteList?: string[]
+   autoKick?:I_AutoKick,
+   autoWarn?:I_AutoWarn
+}
+export interface I_AutoKick{
+   keyword:RegExp|string
+   message?:string
+}
+export interface I_AutoWarn{
+   keyword:RegExp|string
+   message?:string
 }
 export interface I_RoomManager {
    rooms: I_Room[],
@@ -32,7 +42,7 @@ export interface I_Vote {
    mentionId: string,
    roomId: string,
    count: number,
-   voteerId: string | undefined | null
+   voterId: string | undefined | null
 }
 export interface I_Database {
    votes: I_Vote[]
