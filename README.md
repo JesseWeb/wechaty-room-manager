@@ -1,4 +1,4 @@
-# Wechaty-Room-Manager [![Build Status](https://travis-ci.org/JesseWeb/wechaty-room-manager.svg?branch=master)](https://travis-ci.org/JesseWeb/wechaty-room-manager) [![Npm Version](https://img.shields.io/npm/v/wechaty-room-manager.svg?sanitize=true)](https://travis-ci.org/JesseWeb/wechaty-room-manager)
+# Wechaty-Room-Manager [![Npm Version](https://img.shields.io/npm/v/wechaty-room-manager.svg?sanitize=true)](https://travis-ci.org/JesseWeb/wechaty-room-manager)
 
 ## What is this?
 
