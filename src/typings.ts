@@ -7,6 +7,7 @@ export interface I_Room {
    warnTemp?(count: number, voltCount: number | undefined, contact: Contact): string,
    kickoutTemp?(contact: Contact): string,
    // enableVolt?: boolean,
+   knockKnock?:string,
    voltSymbol?: string[],
    kickoutSymbol?: string[],
    voltCount?: number
@@ -22,7 +23,8 @@ export interface I_RoomManager {
    /**
     * it has to be wechat id(wechat account)--based on Contact.load()
     *  */
-   admins: string[]
+   admins: string[],
+   friendshipAcceped?: boolean
 }
 
 export interface I_Volt {
